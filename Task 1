@@ -1,1 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Energy Consumption vs Date Chart</title>
+  <!-- Include Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div style="width: 80%; margin: auto;">
+    <canvas id="energyChart"></canvas>
+  </div>
+
+  <script>
+    // Function to fetch and render the chart
+    async function fetchDataAndCreateChart() {
+      // URL of the JSON file (after making it publicly accessible)
+      const jsonURL = "https://path-to-your-json-file";
+
+      try {
+        // Fetch the data from the URL
+        const response = await fetch(jsonURL);
+        const data = await response.json();
+
+        // Extract the 'total_kwh' and 'createdAt' values
+        const dates = data.map(item => item.createdAt); // Assuming 'createdAt' is in the correct format
+        const energyConsumption = data.map(item => item.total_kwh); // Extracting 'total_kwh'
+
+        // Prepare the data for Chart.js
+        const chartData = {
+          labels: dates, // Dates on x-axis
+          datasets: [{
+            label: 'Energy Consumption (kWh)', // Label for the dataset
+            data: energyConsumption, // Data for y-axis (energy consumption)
+            borderColor: 'rgba(75, 192, 192, 1)', // Line color
+            backgroundColor: 'rgba(75, 192, 192, 0.2)', // Line fill color
+            borderWidth: 1,
+            fill: true
+          }]
+        };
+
+        // Chart.js configuration
+        const config = {
+          type: 'line', // Chart type (line chart)
+          data: chartData,
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                type: 'time', // Use time scale for x-axis
+                time: {
+                  unit: 'day', // Group the dates by day
+                  tooltipFormat: 'll', // Date format in tooltip
+                },
+                title: {
+                  display: true,
+                  text: 'Date'
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Energy Consumption (kWh)'
+                }
+              }
+            },
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(tooltipItem) {
+                    return tooltipItem.raw + ' kWh'; // Show value with "kWh" label
+                  }
+                }
+              }
+            }
+          }
+        };
+
+        // Create the chart using Chart.js
+        new Chart(document.getElementById('energyChart'), config);
+
+      } catch (error) {
+        console.error('Error fetching or processing the data:', error);
+      }
+    }
+
+    // Fetch the data and create the chart when the page loads
+    fetchDataAndCreateChart();
+  </script>
+</body>
+</html>
 
